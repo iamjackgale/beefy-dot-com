@@ -1,23 +1,23 @@
-import React, { memo, useMemo } from 'react';
+import React from 'react';
 import { graphql } from 'gatsby';
 import { Meta } from '../../components/Common/Meta';
 import { ArticleGrid } from '../../components/Blog/ArticleGrid';
 import { Inner } from '../../components/Common/Inner';
-import { ListArticles } from '../../data/queries/list-articles';
 import styled from '@emotion/styled';
 import { theme } from '../../theme';
 import { ArticlePagination } from '../../components/Blog/ArticlePagination';
+import { ListArticles } from '../../data/queries/list-articles';
 
-type TemplateProps = {
+type TagTemplateProps = {
   data: {
     allMarkdownRemark: ListArticles;
   };
   pageContext: {
+    tag: string;
     limit: number;
     skip: number;
     numPages: number;
     currentPage: number;
-    tag?: string;
   };
 };
 
@@ -29,29 +29,27 @@ const Pagination = styled(ArticlePagination)`
   margin-top: ${theme.spacing(3)};
 `;
 
-const Template = memo<TemplateProps>(function Template({ data, pageContext }) {
-  const articles = useMemo(
-    () => data.allMarkdownRemark.edges.map(edge => edge.node),
-    [data.allMarkdownRemark.edges]
-  );
+const TagTemplate: React.FC<TagTemplateProps> = ({ data, pageContext }) => {
+  const articles = data.allMarkdownRemark.edges.map(edge => edge.node);
+  const { tag, currentPage, numPages } = pageContext;
 
   return (
     <>
-      <Meta title="News" description="Keep up to date with the latest Beefy News articles." />
+      <Meta title={`Posts tagged with "${tag}"`} description={`Articles tagged with "${tag}"`} />
       <Outer>
         <Inner>
           <ArticleGrid articles={articles} />
-          <Pagination currentPage={pageContext.currentPage} numPages={pageContext.numPages} />
+          <Pagination currentPage={currentPage} numPages={numPages} tag={tag} />
         </Inner>
       </Outer>
     </>
   );
-});
+};
 
 export const pageQuery = graphql`
-  query ($skip: Int!, $limit: Int!) {
+  query ($skip: Int!, $limit: Int!, $tag: String) {
     allMarkdownRemark(
-      filter: { frontmatter: { draft: { ne: true } } }
+      filter: { frontmatter: { tags: { in: [$tag] }, draft: { ne: true } } }
       sort: { fields: [frontmatter___date], order: DESC }
       limit: $limit
       skip: $skip
@@ -65,4 +63,4 @@ export const pageQuery = graphql`
   }
 `;
 
-export default Template;
+export default TagTemplate;
