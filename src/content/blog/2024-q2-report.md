@@ -17,6 +17,8 @@ tags: [financial]
 
 ![](/src/images/blog/2024-q2-report/q2-3.png)
 
+![](/src/images/blog/2024-q2-report/q2-4.png)
+
 ![](/src/images/blog/2024-q2-report/q2-5.png)
 
 ![](/src/images/blog/2024-q2-report/q2-6.png)
